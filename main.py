@@ -64,6 +64,7 @@ def buyTickets():
     numberOfTickets = int(input("Number of seats to buy: "))
     startingSeat = input("Starting seat (ex. 3D): ")
     row = int(startingSeat[0])
+    column = ord(startingSeat[1]) - 65
     
     #set price and seat price
     if (row < 5):
@@ -79,7 +80,7 @@ def buyTickets():
     #check if seats are available
     available = True
     for i in range(numberOfTickets):
-        if (seating[row][ord(startingSeat[1]) - 65 + i] != '.'):
+        if (seating[row][column + i] != '.'):
             available = False
     if (available == False):
         print("The seats you chose are not available for purchase. Please try again.")
@@ -88,6 +89,42 @@ def buyTickets():
     print(numberOfTickets, " seats starting at (", startingSeat, ") are available for purchase", end = "\n")
     name = input("Enter your name: ")
     email = input("Enter your email address: ")
+
+    #reserves seats
+    for i in range (numberOfTickets):
+        seating[row][column + i] = "X"
+    
+    try:
+        for i in range (numberOfTickets + 4):
+            seating[row - 1][column - 2 + i] = "E"
+    except IndexError:
+        pass
+
+    try:
+        for i in range (numberOfTickets + 4):
+            seating[row + 1][column - 2 + i] = "E"
+    except IndexError:
+        pass
+
+    try:
+        seating[row][column + numberOfTickets] = "E"
+    except IndexError:
+        pass
+    
+    try:
+        seating[row][column + numberOfTickets + 1] = "E"
+    except IndexError:
+        pass
+
+    try:
+        seating[row][column - 1] = "E"
+    except IndexError:
+        pass
+
+    try:
+        seating[row][column - 2] = "E"
+    except IndexError:
+        pass
 
     #calculate costs and print receipt
     printLines()
