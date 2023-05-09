@@ -63,8 +63,8 @@ def printMenu():
 def buyTickets():
     numberOfTickets = int(input("Number of seats to buy: "))
     startingSeat = input("Starting seat (ex. 3D): ")
-    row = int(startingSeat[0])
-    column = ord(startingSeat[1]) - 65
+    row = int(startingSeat[:-1])
+    column = ord(startingSeat[len(startingSeat) - 1]) - 65
     
     #set price and seat price
     if (row < 5):
@@ -93,39 +93,28 @@ def buyTickets():
     #reserves seats
     for i in range (numberOfTickets):
         seating[row][column + i] = "X"
+    spaceLeft = 2
+    spaceRight = 2
+    for i in range (2, 0, -1):
+        if (column < i):
+            spaceLeft -= 1
+    for i in range (24, 26):
+        if (column + numberOfTickets > i):
+            spaceRight -= 1
+
+    for i in range (1, spaceLeft + 1):
+        seating[row][column - i] = 'E'
+    for i in range (0, spaceRight):
+        seating[row][column + numberOfTickets + i] = 'E'
+
+    if (row != 0):
+        for i in range (numberOfTickets + spaceLeft + spaceRight):
+            seating[row - 1][column - spaceLeft + i] = 'E'
+    if (row != 19):
+        for i in range (numberOfTickets + spaceLeft + spaceRight):
+            seating[row + 1][column - spaceLeft + i] = 'E'
+
     
-    try:
-        for i in range (numberOfTickets + 4):
-            seating[row - 1][column - 2 + i] = "E"
-    except IndexError:
-        pass
-
-    try:
-        for i in range (numberOfTickets + 4):
-            seating[row + 1][column - 2 + i] = "E"
-    except IndexError:
-        pass
-
-    try:
-        seating[row][column + numberOfTickets] = "E"
-    except IndexError:
-        pass
-    
-    try:
-        seating[row][column + numberOfTickets + 1] = "E"
-    except IndexError:
-        pass
-
-    try:
-        seating[row][column - 1] = "E"
-    except IndexError:
-        pass
-
-    try:
-        seating[row][column - 2] = "E"
-    except IndexError:
-        pass
-
     #calculate costs and print receipt
     printLines()
     print("Receipt")
@@ -140,7 +129,7 @@ def buyTickets():
     print(seatType)
     print("Seats: ", "\t", end = "\t")
     for i in range (numberOfTickets):
-        print(startingSeat[0], chr(ord(startingSeat[1]) + i), sep = '', end = " ")
+        print(startingSeat[:-1], chr(ord(startingSeat[len(startingSeat) - 1]) + i), sep = '', end = " ")
     print()
     print("Ticket Cost:", "\t", end = "\t")
     ticketCosts = price * numberOfTickets
