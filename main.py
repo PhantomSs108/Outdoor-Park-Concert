@@ -1,4 +1,7 @@
 
+from receipt import receipt
+import json
+
 n_row = 20
 n_col = 26
 seating = []
@@ -114,44 +117,37 @@ def buyTickets():
         for i in range (numberOfTickets + spaceLeft + spaceRight):
             seating[row + 1][column - spaceLeft + i] = 'E'
 
-    
-    #calculate costs and print receipt
+    purchases.append(receipt(name, email, numberOfTickets, seatType, startingSeat, price))
     printLines()
     print("Receipt")
-    printLines()
-    print("Name:", "\t", "\t", end = "\t")
-    print(name)
-    print("Email:", "\t", "\t", end = "\t")
-    print(email)
-    print("Number of Tickets:", end = "\t")
-    print(numberOfTickets)
-    print("Seat Type:", "\t", end = "\t")
-    print(seatType)
-    print("Seats: ", "\t", end = "\t")
-    for i in range (numberOfTickets):
-        print(startingSeat[:-1], chr(ord(startingSeat[len(startingSeat) - 1]) + i), sep = '', end = " ")
-    print()
-    print("Ticket Cost:", "\t", end = "\t")
-    ticketCosts = price * numberOfTickets
-    print(f"${ticketCosts:.2f}")
-    print("Mask Fee: ", "\t", end = "\t")
-    maskFee = numberOfTickets * 5
-    print(f"${maskFee:.2f}")
-    print("Sub-total: ", "\t", end = "\t")
-    subtotal = price * numberOfTickets + numberOfTickets * 5
-    print(f"${subtotal:.2f}")
-    tax = subtotal * 0.0725
-    total = subtotal + tax
-    print("Tax:", "\t", "\t", end = "\t")
-    print(f"${tax:.2f}")
-    printLines()
-    print("Total:", "\t", "\t", end = "\t")
-    print(total)
-    printLines()
+    purchases[-1].printReceipt()
 
+def searchCustomer():
+    printLines()
+    print("Search for Attendee")
+    printLines()
+    customer = input("Enter an attendee: ")
+    for element in purchases:
+        if (element.name == customer):
+            element.printReceipt()
+            return
+    print("Attendee was not found")
+    
+def displayAll():
+    printLines()
+    print("Display All Purchases")
+    printLines()
+    for element in purchases:
+        element.printReceipt()
+
+def convertJson(): 
+    for element in purchases:
+        jsonData.append(json.dumps(element.__dict__))
 
 
 createSeats()
+purchases = []
+jsonData = []
 command = ""
 
 while (command != 'q'):
@@ -162,4 +158,11 @@ while (command != 'q'):
             buyTickets()
         case 'v':   
             viewSeating()
+        case 's':
+            searchCustomer()
+        case 'd':
+            displayAll()
+convertJson()
+print(jsonData[0])
+print(type(jsonData[0]))
 
