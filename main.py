@@ -63,37 +63,10 @@ def printMenu():
     print('[d] display all the purchases made and the total amount of income')
     print('[q] to quit')
 
-def buyTickets():
-    numberOfTickets = int(input("Number of seats to buy: "))
-    startingSeat = input("Starting seat (ex. 3D): ")
+def loadSeats(name, email, numberOfTickets, seatType, startingSeat, price):
     row = int(startingSeat[:-1])
     column = ord(startingSeat[len(startingSeat) - 1]) - 65
-    
-    #set price and seat price
-    if (row < 5):
-        price = 80
-        seatType = "front"
-    elif(row < 11):
-        price = 50
-        seatType = "middle"
-    else:
-        price = 25
-        seatType = "back"
-    
-    #check if seats are available
-    available = True
-    for i in range(numberOfTickets):
-        if (seating[row][column + i] != '.'):
-            available = False
-    if (available == False):
-        print("The seats you chose are not available for purchase. Please try again.")
-        return
-    
-    print(numberOfTickets, " seats starting at (", startingSeat, ") are available for purchase", end = "\n")
-    name = input("Enter your name: ")
-    email = input("Enter your email address: ")
 
-    #reserves seats
     for i in range (numberOfTickets):
         seating[row][column + i] = "X"
     spaceLeft = 2
@@ -116,6 +89,37 @@ def buyTickets():
     if (row != 19):
         for i in range (numberOfTickets + spaceLeft + spaceRight):
             seating[row + 1][column - spaceLeft + i] = 'E'
+
+
+def buyTickets():
+    numberOfTickets = int(input("Number of seats to buy: "))
+    startingSeat = input("Starting seat (ex. 3D): ")
+    row = int(startingSeat[:-1])
+    column = ord(startingSeat[len(startingSeat) - 1]) - 65
+    
+    #set price and seat type
+    if (row < 5):
+        price = 80
+        seatType = "front"
+    elif(row < 11):
+        price = 50
+        seatType = "middle"
+    else:
+        price = 25
+        seatType = "back"
+    
+    #check if seats are available
+    for i in range(numberOfTickets):
+        if (seating[row][column + i] != '.'):
+            print("The seats you chose are not available for purchase. Please try again.")
+            return
+    
+    print(numberOfTickets, " seats starting at (", startingSeat, ") are available for purchase", end = "\n")
+    name = input("Enter your name: ")
+    email = input("Enter your email address: ")
+
+    #reserves seats
+    loadSeats(name, email, numberOfTickets, seatType, startingSeat, price)
 
     purchases.append(receipt(name, email, numberOfTickets, seatType, startingSeat, price))
     printLines()
@@ -140,15 +144,31 @@ def displayAll():
     for element in purchases:
         element.printReceipt()
 
-def convertJson(): 
-    for element in purchases:
-        jsonData.append(json.dumps(element.__dict__))
+def convertJson():  
+    purchasesList = [p.__dict__ for p in purchases]
+    with open ('outdoorParkData.json', 'w') as f:
+        json.dump(purchasesList, f)
+    f.close()
 
+def readJson():
+    try:
+        with open ('outdoorParkData.json', 'r') as f:
+            purchasesList = json.load(f)
+        purchases = [receipt(p['name'], p['email'], p['numberOfTickets'], p['seatType'], p['startingSeat'], p['price']) for p in purchasesList]
+    except (Exception):
+        pass
+
+def updateSeats():
+    for p in purchases:
+        loadSeats(p.name, p.email, p.numberOfTickets, p.seatType, p.startingSeat, p.price)
 
 createSeats()
+purchasesList = []
 purchases = []
-jsonData = []
 command = ""
+readJson()
+updateSeats()
+print(purchases)
 
 while (command != 'q'):
     printMenu()
@@ -162,7 +182,5 @@ while (command != 'q'):
             searchCustomer()
         case 'd':
             displayAll()
-convertJson()
-print(jsonData[0])
-print(type(jsonData[0]))
 
+convertJson()

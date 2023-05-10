@@ -43,5 +43,5 @@ class receipt:
         print(f"${tax:.2f}")
         self.printLines()
         print("Total:", "\t", "\t", end = "\t")
-        print(total)
+        print(f"${total:.2f}")
         self.printLines()
